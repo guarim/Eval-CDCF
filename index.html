@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCM Technologie : Analyse Fonctionnelle & Chaîne d'Énergie</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f4f7f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--secondary-color);
+        }
+
+        /* Formulaire de connexion */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Section Question */
+        .question-container {
+            display: none; /* Masqué par défaut */
+        }
+
+        .question-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7f8c8d;
+            font-weight: bold;
+            font-size: 1.2em;
+            text-align: center;
+        }
+        
+        /* Pour simuler l'image si pas de fichier local */
+        .img-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #dfe6e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border: 2px dashed #b2bec3;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-label {
+            display: block;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-label:hover {
+            background-color: #e3f2fd;
+            border-color: var(--primary-color);
+        }
+
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #eee;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            height: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--success-color);
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+
+        /* Résultats */
+        .results-container {
+            display: none;
+        }
+
+        .score-card {
+            text-align: center;
+            background: var(--secondary-color);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .score-big {
+            font-size: 3em;
+            font-weight: bold;
+        }
+
+        .review-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border-left: 5px solid transparent;
+        }
+
+        .review-item.correct {
+            border-left-color: var(--success-color);
+            background-color: #f0fff4;
+        }
+
+        .review-item.incorrect {
+            border-left-color: var(--error-color);
+            background-color: #fff5f5;
+        }
+
+        .explanation {
+            font-style: italic;
+            color: #666;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 1. Écran de Connexion -->
+    <div id="login-screen">
+        <h1>QCM Technologie</h1>
+        <p style="text-align: center;">Thèmes : Bête à corne, Fonctions, Chaîne d'énergie, CDCF</p>
+        <div class="login-form">
+            <label>Nom : <input type="text" id="nom" required></label>
+            <label>Prénom : <input type="text" id="prenom" required></label>
+            <label>Classe : <input type="text" id="classe" placeholder="ex: 3ème B" required></label>
+            <button onclick="startQuiz()">Commencer le test</button>
+        </div>
+    </div>
+
+    <!-- 2. Écran du Quiz -->
+    <div id="quiz-screen" class="question-container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+        <h2 id="question-number">Question 1/20</h2>
+        
+        <!-- Placeholder pour l'image -->
+        <div id="q-image" class="question-image">
+            <img src="" alt="Image de la question" style="max-width:100%; max-height:100%; display:none;" id="real-img">
+            <span id="img-text">Image illustrative</span>
+        </div>
+
+        <h3 id="question-text">Intitulé de la question...</h3>
+        
+        <div class="options" id="options-container">
+            <!-- Les options seront insérées ici par JS -->
+        </div>
+
+        <div style="margin-top: 20px; text-align: right;">
+            <button onclick="nextQuestion()" id="next-btn">Suivant</button>
+        </div>
+    </div>
+
+    <!-- 3. Écran des Résultats -->
+    <div id="result-screen" class="results-container">
+        <h1>Résultats du test</h1>
+        <div class="score-card">
+            <p>Élève : <span id="student-name"></span></p>
+            <p>Note obtenue</p>
+            <div class="score-big"><span id="score-val">0</span>/20</div>
+        </div>
+
+        <h3>Correction détaillée :</h3>
+        <div id="correction-list">
+            <!-- La liste des corrections sera générée ici -->
+        </div>
+        
+        <div style="text-align: center; margin-top:20px;">
+            <button onclick="location.reload()">Recommencer</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- DONNÉES DU QCM ---
+    // Note: Les images utilisent un service de placeholder avec du texte pour que vous voyiez le contexte.
+    const questions = [
+        // THÈME : BÊTE À CORNE & CDCF
+        {
+            text: "Dans le diagramme 'Bête à corne', que représente la bulle de gauche ?",
+            imageText: "Schéma Bête à corne : Bulle gauche ?",
+            options: ["Sur quoi agit-il ?", "A qui rend-il service ?", "Dans quel but ?", "Le produit"],
+            correct: 1,
+            explanation: "La bulle de gauche correspond à la cible ou l'utilisateur : 'A qui le produit rend-il service ?'."
+        },
+        {
+            text: "Quelle question pose-t-on pour remplir la bulle du bas dans la Bête à corne ?",
+            imageText: "Schéma Bête à corne : Bulle du bas ?",
+            options: ["D'où vient l'énergie ?", "Dans quel but ?", "Combien ça coûte ?", "Sur quoi agit-il ?"],
+            correct: 1,
+            explanation: "La partie basse définit la fonction globale : 'Dans quel but le produit existe-t-il ?'."
+        },
+        {
+            text: "Comment appelle-t-on l'outil graphique qui permet d'exprimer le besoin ?",
+            imageText: "Outil graphique en forme de tête",
+            options: ["Le diagramme FAST", "La bête à corne (APTE)", "L'organigramme", "Le schéma cinématique"],
+            correct: 1,
+            explanation: "La bête à corne est l'outil spécifique pour la méthode APTE d'expression du besoin."
+        },
+        {
+            text: "Que signifie le sigle C.D.C.F ?",
+            imageText: "Document officiel : C.D.C.F",
+            options: ["Cahier De Commande Final", "Cahier Des Charges Fonctionnel", "Centre De Création Français", "Code Des Charges Fabriquées"],
+            correct: 1,
+            explanation: "Cahier Des Charges Fonctionnel : document contractuel fixant les besoins et contraintes."
+        },
+        {
+            text: "Dans la Bête à corne, que place-t-on au centre du diagramme ?",
+            imageText: "Schéma Bête à corne : Centre ?",
+            options: ["L'utilisateur", "La matière d'œuvre", "Le nom du produit", "Le prix"],
+            correct: 2,
+            explanation: "Le centre du graphique désigne l'objet technique ou le système étudié."
+        },
+
+        // THÈME : FONCTIONS (TECHNIQUES, SERVICE, CONTRAINTES)
+        {
+            text: "Une fonction qui décrit l'action du produit pour répondre au besoin de l'utilisateur est une :",
+            imageText: "FP vs FC",
+            options: ["Fonction Contrainte (FC)", "Fonction Principale (FP)", "Fonction Technique (FT)", "Fonction d'Estime"],
+            correct: 1,
+            explanation: "La Fonction Principale (FP) justifie la création du produit (la raison pour laquelle on l'achète)."
+        },
+        {
+            text: "Une fonction imposée par l'environnement (normes, sécurité, énergie) est une :",
+            imageText: "Environnement extérieur -> Produit",
+            options: ["Fonction Principale", "Fonction Contrainte", "Fonction Secondaire", "Fonction d'Usage"],
+            correct: 1,
+            explanation: "Une Fonction Contrainte (FC) limite la liberté du concepteur (ex: doit être étanche, doit fonctionner sur batterie)."
+        },
+        {
+            text: "Quel diagramme permet de décomposer les fonctions de service en fonctions techniques ?",
+            imageText: "Arborescence de fonctions : Quand / Pourquoi / Comment",
+            options: ["Le diagramme FAST", "Le diagramme Pieuvre", "L'histogramme", "Le diagramme de Gantt"],
+            correct: 0,
+            explanation: "Le diagramme FAST (Function Analysis System Technique) décompose le 'Comment' réaliser une fonction."
+        },
+        {
+            text: "Dans un cahier des charges, chaque fonction est définie par :",
+            imageText: "Tableau : Fonction | Critère | Niveau",
+            options: ["Un prix et une couleur", "Un critère et un niveau", "Un dessin et une photo", "Une marque et un slogan"],
+            correct: 1,
+            explanation: "Exemple : Pour la fonction 'Être autonome', le Critère est 'Temps' et le Niveau est '2 heures'."
+        },
+        {
+            text: "Quelle est la définition d'une fonction technique ?",
+            imageText: "Solution technique interne",
+            options: ["La relation avec l'utilisateur", "L'aspect visuel du produit", "Une solution interne pour réaliser une fonction de service", "Le prix de vente"],
+            correct: 2,
+            explanation: "Les fonctions techniques sont les solutions constructives (internes) choisies par l'ingénieur."
+        },
+
+        // THÈME : CHAÎNE D'ÉNERGIE
+        {
+            text: "Dans quel ordre trouve-t-on généralement les blocs de la chaîne d'énergie ?",
+            imageText: "Ordre des blocs : A -> D -> C -> T",
+            options: [
+                "Transmettre -> Convertir -> Distribuer -> Alimenter",
+                "Alimenter -> Distribuer -> Convertir -> Transmettre",
+                "Convertir -> Alimenter -> Transmettre -> Distribuer",
+                "Distribuer -> Alimenter -> Convertir -> Transmettre"
+            ],
+            correct: 1,
+            explanation: "L'ordre logique est : Alimenter (Source) -> Distribuer (Commande) -> Convertir (Transformation) -> Transmettre (Action)."
+        },
+        {
+            text: "Quelle est la fonction d'une pile ou d'une batterie ?",
+            imageText: "Image d'une batterie",
+            options: ["Convertir", "Transmettre", "Alimenter / Stocker", "Distribuer"],
+            correct: 2,
+            explanation: "La batterie stocke l'énergie et ALIMENTE le système en électricité."
+        },
+        {
+            text: "Quel composant assure généralement la fonction 'Distribuer' ?",
+            imageText: "Image : Interrupteur / Relais",
+            options: ["Un moteur", "Un engrenage", "Un interrupteur ou un relais", "Une roue"],
+            correct: 2,
+            explanation: "La fonction Distribuer contrôle le flux d'énergie (Ouvrir/Fermer le circuit), comme un interrupteur."
+        },
+        {
+            text: "Quel est le rôle d'un moteur électrique dans la chaîne d'énergie ?",
+            imageText: "Image d'un moteur électrique",
+            options: ["Alimenter", "Convertir", "Transmettre", "Acquérir"],
+            correct: 1,
+            explanation: "Le moteur CONVERTIT l'énergie électrique en énergie mécanique (mouvement)."
+        },
+        {
+            text: "Les engrenages, courroies ou chaines servent principalement à :",
+            imageText: "Image d'engrenages",
+            options: ["Transmettre", "Convertir", "Distribuer", "Alimenter"],
+            correct: 0,
+            explanation: "Ils TRANSMETTENT le mouvement (l'énergie mécanique) jusqu'à l'effecteur final (roue, hélice...)."
+        },
+
+        // THÈME : MÉLANGE / EXEMPLES CONCRETS
+        {
+            text: "Dans un vélo électrique, la batterie appartient à :",
+            imageText: "Vélo électrique",
+            options: ["La chaîne d'information", "La chaîne d'énergie", "La structure porteuse", "L'esthétique"],
+            correct: 1,
+            explanation: "La batterie fournit l'énergie nécessaire au mouvement, elle fait partie de la chaîne d'énergie."
+        },
+        {
+            text: "Sur une Bête à corne d'un lampadaire, 'Sur quoi agit-il ?' correspond à :",
+            imageText: "Lampadaire éclairant la rue",
+            options: ["L'œil de l'utilisateur", "La zone à éclairer", "L'ampoule", "L'électricité"],
+            correct: 1,
+            explanation: "Le lampadaire agit sur l'environnement obscur, donc la zone à éclairer."
+        },
+        {
+            text: "Dans la chaîne d'information, quel élément 'Acquiert' l'information ?",
+            imageText: "Capteur de présence",
+            options: ["Le capteur", "Le microcontrôleur", "La LED", "Le fil électrique"],
+            correct: 0,
+            explanation: "Les capteurs (température, présence, lumière) assurent la fonction ACQUÉRIR."
+        },
+        {
+            text: "Que représente le 'Flux d'énergie' sur un schéma ?",
+            imageText: "Flèches pleines vs pointillés",
+            options: ["Le passage des informations logiques", "La circulation de la puissance pour réaliser l'action", "Le déplacement de l'utilisateur", "Le recyclage du produit"],
+            correct: 1,
+            explanation: "Le flux d'énergie concerne la puissance (électricité, mouvement) nécessaire pour agir sur la matière d'œuvre."
+        },
+        {
+            text: "Pour valider un besoin (Bête à corne), que doit-on vérifier ?",
+            imageText: "Validation du besoin",
+            options: ["Que le produit est joli", "Que le besoin ne va pas disparaître prochainement", "Que le produit est cher", "Que le produit est déjà fabriqué"],
+            correct: 1,
+            explanation: "On valide le besoin en s'assurant qu'il est durable et que le produit apporte une réelle plus-value."
+        }
+    ];
+
+    // --- LOGIQUE JAVASCRIPT ---
+
+    let currentQuestionIndex = 0;
+    let userAnswers = []; // Stocke les réponses de l'élève
+    let studentInfo = {};
+
+    function startQuiz() {
+        const nom = document.getElementById('nom').value.trim();
+        const prenom = document.getElementById('prenom').value.trim();
+        const classe = document.getElementById('classe').value.trim();
+
+        if (!nom || !prenom || !classe) {
+            alert("Merci de remplir tous les champs (Nom, Prénom, Classe) !");
+            return;
+        }
+
+        studentInfo = { nom, prenom, classe };
+        
+        // Cacher login, montrer quiz
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
+
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const q = questions[currentQuestionIndex];
+        
+        // Mise à jour de la barre de progression
+        const progressPercent = ((currentQuestionIndex) / questions.length) * 100;
+        document.getElementById('progress').style.width = progressPercent + "%";
+
+        // Mise à jour textes
+        document.getElementById('question-number').textContent = `Question ${currentQuestionIndex + 1} / ${questions.length}`;
+        document.getElementById('question-text').textContent = q.text;
+
+        // Mise à jour image (Placeholder avec texte dynamique)
+        const imgUrl = `https://placehold.co/600x200/png?text=${encodeURIComponent(q.imageText)}&font=roboto`;
+        document.getElementById('real-img').src = imgUrl;
+        document.getElementById('real-img').style.display = 'block';
+        document.getElementById('img-text').style.display = 'none';
+
+        // Génération des options
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = ''; // Vider les anciennes
+
+        q.options.forEach((opt, index) => {
+            const label = document.createElement('label');
+            label.className = 'option-label';
+            
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'q_option';
+            radio.value = index;
+            
+            label.appendChild(radio);
+            label.appendChild(document.createTextNode(opt));
+            optionsContainer.appendChild(label);
+        });
+
+        // Gestion du bouton (Dernière question -> Terminer)
+        const btn = document.getElementById('next-btn');
+        if (currentQuestionIndex === questions.length - 1) {
+            btn.textContent = "Terminer et voir les résultats";
+        } else {
+            btn.textContent = "Suivant";
+        }
+    }
+
+    function nextQuestion() {
+        // Vérifier si une réponse est cochée
+        const selected = document.querySelector('input[name="q_option"]:checked');
+        if (!selected) {
+            alert("Veuillez sélectionner une réponse.");
+            return;
+        }
+
+        // Sauvegarder la réponse
+        userAnswers.push(parseInt(selected.value));
+
+        // Passer à la suivante ou finir
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            loadQuestion();
+        } else {
+            finishQuiz();
+        }
+    }
+
+    function finishQuiz() {
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        
+        let score = 0;
+        const correctionContainer = document.getElementById('correction-list');
+        correctionContainer.innerHTML = '';
+
+        // Afficher Nom/Prénom
+        document.getElementById('student-name').textContent = `${studentInfo.nom.toUpperCase()} ${studentInfo.prenom} (${studentInfo.classe})`;
+
+        // Boucle de correction
+        questions.forEach((q, index) => {
+            const userRep = userAnswers[index];
+            const isCorrect = (userRep === q.correct);
+            
+            if (isCorrect) score++;
+
+            // Création de l'élément de révision
+            const item = document.createElement('div');
+            item.className = `review-item ${isCorrect ? 'correct' : 'incorrect'}`;
+
+            let html = `<strong>Question ${index + 1}:</strong> ${q.text}<br>`;
+            
+            if (isCorrect) {
+                html += `<span style="color:var(--success-color)">✔ Bonne réponse : ${q.options[q.correct]}</span>`;
+            } else {
+                html += `<span style="color:var(--error-color)">✘ Votre réponse : ${q.options[userRep]}</span><br>`;
+                html += `<span style="color:var(--success-color)">➜ La bonne réponse était : ${q.options[q.correct]}</span>`;
+            }
+
+            html += `<div class="explanation">💡 Explication : ${q.explanation}</div>`;
+            
+            item.innerHTML = html;
+            correctionContainer.appendChild(item);
+        });
+
+        // Affichage de la note
+        document.getElementById('score-val').textContent = score;
+    }
+</script>
+
+</body>
+</html>
